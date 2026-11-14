@@ -294,7 +294,7 @@ def git_info_str(
 
 
 def build_line1(data: StatusData, theme: Theme) -> str:
-    """Build Line 1: Model (+ Effort) | Context Bar (16 segs) | Tokens.
+    """Build Line 1: Model | Context Bar (16 segs) | Tokens.
 
     Args:
         data (StatusData): Parsed status data.
@@ -304,8 +304,7 @@ def build_line1(data: StatusData, theme: Theme) -> str:
         str: ANSI-formatted first line of the status output.
     """
     sep = f" {theme.sep}│{RESET} "
-    effort_suffix = f" ({data.effort})" if data.effort else ""
-    model_seg = f"{theme.model}{ICON_MODEL} {data.model_name}{effort_suffix}{RESET}"
+    model_seg = f"{theme.model}{ICON_MODEL} {data.model_name}{RESET}"
     ctx_seg = f"{theme.dim}{ICON_CTX}{RESET} {context_bar_str(data.used_percentage, theme)}"
     tok_seg = tokens_str(data, theme)
     return sep.join([model_seg, ctx_seg, tok_seg])

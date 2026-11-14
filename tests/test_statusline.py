@@ -38,22 +38,21 @@ def strip_ansi(text: str) -> str:
     return ANSI_RE.sub("", text)
 
 
-def test_parse_model_and_effort() -> None:
-    """Verify model display_name, id fallback, and nullable effort parsing."""
+def test_parse_model() -> None:
+    """Verify model display_name and id fallback parsing."""
     data = parse_status_data(
         {
             "model": {
                 "id": "gemini-4-argon",
-                "display_name": "Gemini 4 Argon",
+                "display_name": "Gemini 4 Argon (Medium)",
                 "effort": "medium",
             }
         }
     )
-    assert data.model_name == "Gemini 4 Argon"
+    assert data.model_name == "Gemini 4 Argon (Medium)"
     assert data.model_id == "gemini-4-argon"
-    assert data.effort == "medium"
 
-    data_null_effort = parse_status_data(
+    data_fallback = parse_status_data(
         {
             "model": {
                 "id": "gemini-3-pro",
@@ -61,8 +60,7 @@ def test_parse_model_and_effort() -> None:
             }
         }
     )
-    assert data_null_effort.model_name == "gemini-3-pro"
-    assert data_null_effort.effort == ""
+    assert data_fallback.model_name == "gemini-3-pro"
 
     data_empty = parse_status_data({})
     assert data_empty.model_name == "?"
@@ -225,7 +223,7 @@ def test_git_info_str_subprocess_and_fallback() -> None:
 def test_build_lines_and_render_statusline() -> None:
     """Verify full two-line output structure and omission of cost."""
     payload = {
-        "model": {"id": "gemini-4-argon", "display_name": "Gemini 4 Argon", "effort": "medium"},
+        "model": {"id": "gemini-4-argon", "display_name": "Gemini 4 Argon (Medium)", "effort": "medium"},
         "workspace": {"current_dir": "/home/user/projects/agy-cli"},
         "context_window": {
             "used_percentage": 25.0,
@@ -242,7 +240,8 @@ def test_build_lines_and_render_statusline() -> None:
 
     lines = output.splitlines()
     assert len(lines) == 2
-    assert "Gemini 4 Argon (medium)" in lines[0]
+    assert "Gemini 4 Argon (Medium)" in lines[0]
+    assert "(medium)" not in lines[0]
     assert "25%" in lines[0]
     assert "in:2.0k out:400" in lines[0]
     assert "$" not in lines[0]

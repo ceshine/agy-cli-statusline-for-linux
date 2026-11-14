@@ -180,7 +180,6 @@ def parse_status_data(payload: dict[str, Any]) -> StatusData:
     model_id = str(model.get("id") or "")
     display_name = str(model.get("display_name") or "")
     model_name = display_name or model_id or "?"
-    effort = str(model.get("effort") or "")
 
     workspace = _as_dict(payload.get("workspace"))
     cwd = str(workspace.get("current_dir") or payload.get("cwd") or ".")
@@ -233,7 +232,6 @@ def parse_status_data(payload: dict[str, Any]) -> StatusData:
     return StatusData(
         model_name=model_name,
         model_id=model_id,
-        effort=effort,
         cwd=cwd,
         used_percentage=used_percentage,
         context_window_size=context_window_size,

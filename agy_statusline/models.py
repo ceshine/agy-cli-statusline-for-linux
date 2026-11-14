@@ -42,7 +42,6 @@ class StatusData:
     Attributes:
         model_name (str): Display name (or fallback ID) of the active model.
         model_id (str): Identifier of the active model.
-        effort (str): Reasoning effort level (empty string if unset).
         cwd (str): Current working directory path.
         used_percentage (float): Context window usage percentage (0-100).
         context_window_size (int): Maximum context window size in tokens.
@@ -58,7 +57,6 @@ class StatusData:
 
     model_name: str = "?"
     model_id: str = ""
-    effort: str = ""
     cwd: str = "."
     used_percentage: float = 0.0
     context_window_size: int = 0

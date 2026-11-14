@@ -1,0 +1,115 @@
+# Development Guidelines
+
+## Philosophy
+
+### Core Beliefs
+
+- **Incremental progress over big bangs** - Small changes that compile and pass tests
+- **Learning from existing code** - Study and plan before implementing
+- **Pragmatic over dogmatic** - Adapt to project reality
+- **Clear intent over clever code** - Be boring and obvious
+
+### Simplicity Means
+
+- Single responsibility per function/class
+- Avoid premature abstractions
+- No clever tricks - choose the boring solution
+- If you need to explain it, it's too complex
+
+## Decision Framework
+
+When multiple valid approaches exist, choose based on:
+
+1. **Testability** - Can I easily test this?
+2. **Readability** - Will someone understand this in 6 months?
+3. **Consistency** - Does this match project patterns?
+4. **Simplicity** - Is this the simplest solution that works?
+5. **Reversibility** - How hard to change later?
+
+## Technical Standards
+
+### Architecture Principles
+
+- **Composition over inheritance** - Use dependency injection
+- **Interfaces over singletons** - Enable testing and flexibility
+- **Explicit over implicit** - Clear data flow and dependencies
+- **Test-driven when possible** - Never disable tests, fix them
+
+### Error Handling
+
+- Fail fast with descriptive messages
+- Include context for debugging
+- Handle errors at appropriate level
+- Never silently swallow exceptions
+
+### Type Hinting & Validation
+
+- **Comprehensive Typing:** Use type hints for all function signatures and class members. Use modern Python 3.10+ typing syntax (e.g., `list[str]` instead of `List[str]`, `str | None` instead of `Optional[str]`).
+- **Data Validation:** For complex data structures or API models, prefer Pydantic for validation and serialization.
+- **Strictness:** Aim for code that passes `basedpyright` with minimal ignores.
+- **Unused call results:** basedpyright's `reportUnusedCallResult` applies everywhere, tests included. When a call
+  that returns a value is made only for its side effect, assign the result to `_` (e.g. `_ = path.rename(dest)`,
+  `_ = create_user(db, name="alice")`) rather than disabling the rule.
+
+### Logging Standards
+
+- **Standard Logger:** Initialize loggers as `LOGGER = logging.getLogger(__name__)` at module level (see module-level naming under Code Style Guidelines).
+- **Contextual Info:** Use the logger to provide context during long-running operations or errors, but avoid excessive debug logging in production paths.
+
+### CLI & User Interface
+
+- **Typer:** Use `typer` for creating CLI applications. Organize commands logically using sub-commands if necessary.
+- **Rich:** Use `rich` for formatting terminal output (tables, progress bars, colors) to provide a better user experience.
+- **Progress Bars:** Use `tqdm` or `rich.progress` for long-running loops.
+
+### Testing Strategy
+
+- **Pytest:** Use `pytest` for all testing. Organize tests in a `tests/` directory mirroring the structure of the Python package(s).
+- **Fixtures:** Use pytest fixtures for setup/teardown of data, models, or temporary directories.
+- **Mocking:** Mock external services, databases (like Qdrant), or heavy models (Torch) when writing unit tests to keep them fast and reliable.
+
+### Code Style Guidelines
+
+When writing or modifying Python code, you **MUST** adhere to the PEP-8 style guide. Pay particular attention to:
+
+- Naming conventions and whitespace (see the module-level override below).
+- **Module-level names (project convention, overrides PEP-8 defaults):**
+  - Use `UPPER_SNAKE_CASE` for every module-level singleton instance, not only constants:
+    e.g. `LOGGER = logging.getLogger(__name__)`, `APP = typer.Typer(...)`, `CONSOLE = Console()`.
+    This is deliberate; do not rename them to lowercase.
+  - Reference them by that name everywhere, including decorators (`@APP.command()`) and tests
+    (`CliRunner().invoke(APP, ...)`).
+  - Type aliases stay `CapWords` (e.g. `ConfigOption = Annotated[...]`, `PageLoader = Callable[...]`).
+- **Pathlib:** Always use `pathlib.Path` for file and directory operations instead of `os.path` or string manipulations.
+- **Import Grouping:** Imports should be grouped in the following order, with a blank line separating each group:
+    1.  Standard library imports (e.g., `os`, `sys`, `json`)
+    2.  Third-party imports (e.g., `fastapi`, `pydantic`, `uvicorn`)
+    3.  Local application/monorepo-specific imports
+
+    Within each group, the order is set by `lort`, which the pre-commit hook runs (`uvx prek run --files <files>`
+    applies it before committing). Don't sort imports by hand or with ruff: ruff's I001 rule orders imports
+    differently from lort, so if `pyproject.toml` doesn't already disable I001 (e.g. via `ignore = ["I001"]`
+    under `[tool.ruff.lint]`), disable it.
+- **Docstrings:** Follow Google's Python style guide for docstrings strictly. Even when the function signature contains type annotations, include the parameter and return type information in the docstring.
+
+## Python Environment (UV)
+
+This project uses `uv` for Python setup and dependency management.
+
+- **Sync Environment:** `uv sync --frozen` (creates/updates virtualenv from lockfile).
+- **Run Scripts/Tools:** Always prefix runtime commands with `uv run` (e.g., `uv run python main.py`, `uv run pytest`).
+- **Add Dependencies:** Use `uv add <package>` or `uv add --dev <package>`.
+- **Linting & Formatting:** Use the `ruff` version pinned in `uv.lock` (from the `dev` dependency group), the same one CI runs:
+  - `uv run --frozen ruff check .` (Linting)
+  - `uv run --frozen ruff format .` (Formatting; line length comes from `[tool.ruff]` in `pyproject.toml`. If `line-length` is not set there, add `line-length = 120` under `[tool.ruff]` rather than relying on ruff's default of 88)
+  - Fallback: only if the locked `ruff` is not available locally (e.g., the `dev` group cannot be synced), use `uvx ruff check .` and `uvx ruff format .`. Note that `uvx` runs the latest `ruff` release, whose default rules may differ from the locked version CI uses.
+
+Pre-Submission Check:
+
+- Before submitting for review, always run the lint and format commands above (locked `ruff` first, `uvx ruff` as the fallback).
+- Ensure all tests pass with `uv run pytest`.
+
+Guidelines for commands and CI:
+
+- Always prefix runtime commands with `uv run`.
+- Do not use `pip`, `poetry`, or `venv` directly.

@@ -1,0 +1,12 @@
+[project]
+name = "agy-cli-statusline-for-linux"
+version = "0.1.0"
+description = "Linux-first Python status line for the Google Antigravity CLI (agy)"
+requires-python = ">=3.14"
+dependencies = []
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+ignore = ["I001"]

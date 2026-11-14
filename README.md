@@ -1,6 +1,8 @@
 # `agy-cli-statusline-for-linux`
 
-A fast, zero-dependency Linux-first Python status line for the Google Antigravity CLI (`agy`), adapted from [claude-statusline-for-linux](https://github.com/ceshine/claude-statusline-for-linux).
+A fast, zero-dependency Python status line for the Google Antigravity CLI (`agy`), adapted from [claude-statusline-for-linux](https://github.com/ceshine/claude-statusline-for-linux).
+
+> **Note:** This tool primarily targets Linux. Compatibility with macOS and Windows is unverified.
 
 ## Features
 
@@ -13,26 +15,14 @@ A fast, zero-dependency Linux-first Python status line for the Google Antigravit
 
 ## Prerequisites
 
+- **Linux**
 - **Python 3.14+**
-- **[uv](https://docs.astral.sh/uv/)**
+- **[uv](https://docs.astral.sh/uv/)** installed so the `uvx` command is available
 - **`git`** (optional, for detailed repository status counts)
-- **A Nerd Font** (for Material Design icons)
+- **A Nerd Font** (for Material Design icons; otherwise icons may render as empty boxes)
+- **Google Antigravity CLI (`agy`)** with status line support
 
 ## Installation
-
-Install the CLI globally or into a tool environment using `uv`:
-
-```bash
-uv tool install .
-```
-
-Or run directly from the repository with `uv run`:
-
-```bash
-uv run agy-statusline
-```
-
-## Configuration in Antigravity CLI (`agy`)
 
 Add or update the `statusLine` setting in `~/.gemini/antigravity-cli/settings.json`:
 
@@ -40,14 +30,22 @@ Add or update the `statusLine` setting in `~/.gemini/antigravity-cli/settings.js
 {
   "statusLine": {
     "type": "command",
-    "command": "agy-statusline"
+    "command": "uvx --from git+https://github.com/ceshine/agy-cli-statusline-for-linux.git agy-statusline"
   }
 }
 ```
 
-If you didn't install it via `uv tool install`, point `command` to `uv run --directory /path/to/agy-cli-statusline-for-linux agy-statusline`.
-
 You can also toggle or configure the status line interactively inside `agy` using the `/statusline` slash command.
+
+### Update
+
+Run the following command to update the package to the latest version:
+
+```bash
+uvx --refresh --from git+https://github.com/ceshine/agy-cli-statusline-for-linux.git agy-statusline < /dev/null
+```
+
+> **Note:** The `--refresh` flag is intentionally omitted from the statusline configuration, as it would add significant overhead on every invocation.
 
 ## Environment Variables
 

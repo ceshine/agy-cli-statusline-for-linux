@@ -1,9 +1,26 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "agy-cli-statusline-for-linux"
 version = "0.1.0"
 description = "Linux-first Python status line for the Google Antigravity CLI (agy)"
+readme = "README.md"
 requires-python = ">=3.14"
 dependencies = []
+
+[project.scripts]
+agy-statusline = "agy_statusline.cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "ipython",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["agy_statusline"]
 
 [tool.ruff]
 line-length = 120

@@ -17,35 +17,45 @@ A fast, zero-dependency Python status line for the Google Antigravity CLI (`agy`
 
 - **Linux**
 - **Python 3.14+**
-- **[uv](https://docs.astral.sh/uv/)** installed so the `uvx` command is available
+- **[uv](https://docs.astral.sh/uv/)** installed
 - **`git`** (optional, for detailed repository status counts)
 - **A Nerd Font** (for Material Design icons; otherwise icons may render as empty boxes)
 - **Google Antigravity CLI (`agy`)** with status line support
 
 ## Installation
 
-Add or update the `statusLine` setting in `~/.gemini/antigravity-cli/settings.json`:
+1. Install the tool with `uv`:
+
+```bash
+uv tool install git+https://github.com/ceshine/agy-cli-statusline-for-linux.git
+```
+
+Make sure `uv`'s tool bin directory (typically `~/.local/bin`) is on your `PATH` (you can run `uv tool update-shell` if needed), or use the full path `~/.local/bin/agy-statusline` below.
+
+2. Add or update the `statusLine` setting in `~/.gemini/antigravity-cli/settings.json`:
 
 ```json
 {
   "statusLine": {
     "type": "command",
-    "command": "uvx --from git+https://github.com/ceshine/agy-cli-statusline-for-linux.git agy-statusline"
+    "command": "agy-statusline"
   }
 }
 ```
+
+> **Why `uv tool install` instead of `uvx`?** Running `uvx --from git+...` with an unpinned Git URL checks GitHub for updates on invocation, which adds network latency and can sporadically trigger `agy` statusline timeouts (`signal: killed`). Installing the tool locally avoids network checks and keeps startup fast.
 
 You can also toggle or configure the status line interactively inside `agy` using the `/statusline` slash command.
 
 ### Update
 
-Run the following command to update the package to the latest version:
+Run the following command to update the installed tool to the latest commit on GitHub:
 
 ```bash
-uvx --refresh --from git+https://github.com/ceshine/agy-cli-statusline-for-linux.git agy-statusline < /dev/null
+uv tool upgrade --reinstall agy-cli-statusline-for-linux
 ```
 
-> **Note:** The `--refresh` flag is intentionally omitted from the statusline configuration, as it would add significant overhead on every invocation.
+> **Note:** `--reinstall` implies `--refresh`, ensuring `uv` fetches and rebuilds from the latest commit even if the package version number has not changed.
 
 ## Environment Variables
 
